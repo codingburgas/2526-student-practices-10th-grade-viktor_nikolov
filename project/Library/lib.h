@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "string"
+#include <vector>
 int f(int, int);
 void Menu();
 struct User
@@ -18,4 +19,22 @@ struct Admin : User
 	{
 		isAdmin = true;
 	}
+};
+
+
+struct Show {
+	std::string time;
+	std::string hallName;
+	int movieID;
+};
+
+struct Movie {
+	int id;
+	std::string title;
+	std::string genre;
+};
+
+struct Cinema {
+	std::string name;
+	std::vector<Show> shows;
 };
