@@ -1,4 +1,5 @@
 #include "lib.h"
+#include <algorithm> // Needed for transforming strings to lowercase
 
 void Menu()
 {
@@ -39,8 +40,60 @@ void Menu()
         switch (choice)
         {
         case 1:
-            std::cout << "Searching movies...\n";
+        {
+            std::cout << "\n--- Movie Database Catalog ---\n";
+            if (movies.empty()) {
+                std::cout << "No movies available in the database.\n";
+                break;
+            }
+
+            for (size_t i = 0; i < movies.size(); ++i) {
+                std::cout << "- " << movies[i].title << " (" << movies[i].genre << ")\n";
+            }
+
+            std::cout << "\n[SEARCH BAR] Enter movie title to search: ";
+            std::string searchQuery;
+            std::cin >> std::ws;
+            std::getline(std::cin, searchQuery);
+
+            // Convert search query to lowercase for case-insensitive matching
+            std::string searchLower = searchQuery;
+            std::transform(searchLower.begin(), searchLower.end(), searchLower.begin(), ::tolower);
+
+            bool found = false;
+            std::cout << "\n--- Search Results ---\n";
+            for (const auto& m : movies) {
+                std::string movieTitleLower = m.title;
+                std::transform(movieTitleLower.begin(), movieTitleLower.end(), movieTitleLower.begin(), ::tolower);
+
+                // Check if search query matches or is a substring of the title
+                if (movieTitleLower.find(searchLower) != std::string::npos) {
+                    found = true;
+                    std::cout << "[AVAILABLE] \"" << m.title << "\" [" << m.genre << "]\n";
+
+                    // Show specific showtimes available for this movie
+                    bool hasShows = false;
+                    for (const auto& show : c1.shows) {
+                        if (show.movieId == m.id) {
+                            if (!hasShows) {
+                                std::cout << "  -> Showtimes: ";
+                                hasShows = true;
+                            }
+                            std::cout << show.time << " (" << show.hallName << ")  ";
+                        }
+                    }
+                    if (!hasShows) {
+                        std::cout << "  -> No scheduled showtimes currently.";
+                    }
+                    std::cout << "\n";
+                }
+            }
+
+            if (!found) {
+                std::cout << "[NOT FOUND] Sorry, \"" << searchQuery << "\" is not available.\n";
+            }
             break;
+        }
         case 2:
         {
             std::cout << "\n--- Current Showtimes ---\n";
@@ -151,13 +204,11 @@ void Menu()
                         std::cout << "Enter Hall Name (e.g. Hall C): ";
                         std::cin >> newShow.hallName;
 
-                        // Let admin type the name out directly with spaces
                         std::cout << "Enter Movie Title: ";
                         std::string typedTitle;
-                        std::cin >> std::ws; // Clears leading whitespaces
+                        std::cin >> std::ws;
                         std::getline(std::cin, typedTitle);
 
-                        // Check if the movie already exists in the database
                         int targetMovieId = -1;
                         for (const auto& m : movies) {
                             if (m.title == typedTitle) {
@@ -166,7 +217,6 @@ void Menu()
                             }
                         }
 
-                        // If it doesn't exist, create it on the spot
                         if (targetMovieId == -1) {
                             Movie newMovie;
                             newMovie.id = static_cast<int>(movies.size() + 1);
@@ -180,7 +230,6 @@ void Menu()
 
                         newShow.movieId = targetMovieId;
 
-                        // Clear the seating array
                         for (int r = 0; r < 5; ++r)
                             for (int c = 0; c < 5; ++c)
                                 newShow.seating[r][c] = 0;
@@ -256,9 +305,13 @@ void Menu()
         case 6:
             std::cout << "Goodbye!\n";
             break;
+
         default:
             std::cout << "Invalid choice.\n";
             break;
-        }
-        std::cout << "\n====================================\n";} 
-        while (choice != 6);}
+        } // This closes the main switch statement
+
+        std::cout << "\n====================================\n";
+
+    } while (choice != 6); // This cleanly finishes your menu interaction loop
+}
