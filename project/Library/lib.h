@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <algorithm>
 
 struct Movie {
     int id;
@@ -14,13 +15,19 @@ struct Show {
     std::string time;
     std::string hallName;
     int movieId;
-    // Simple 2D array: 0 for available, 1 for booked
     int seating[5][5] = { 0 };
 };
 
 struct Cinema {
     std::string name;
     std::vector<Show> shows;
+};
+struct Payment {
+    std::string movieTitle;
+    std::string showTime;
+    int row;
+    int col;
+    double amount;
 };
 
 class User {

@@ -1,5 +1,5 @@
 #include "lib.h"
-#include <algorithm> // Needed for transforming strings to lowercase
+#include <algorithm>
 
 void Menu()
 {
@@ -11,7 +11,7 @@ void Menu()
         { 2, "The Dark Knight", "Action" },
         { 3, "Interstellar", "Sci-Fi" }
     };
-
+    std::vector<Payment> incomingPayments;
     Cinema c1;
     c1.name = "Grand Central Cinema";
     c1.shows =
@@ -56,7 +56,6 @@ void Menu()
             std::cin >> std::ws;
             std::getline(std::cin, searchQuery);
 
-            // Convert search query to lowercase for case-insensitive matching
             std::string searchLower = searchQuery;
             std::transform(searchLower.begin(), searchLower.end(), searchLower.begin(), ::tolower);
 
@@ -66,12 +65,11 @@ void Menu()
                 std::string movieTitleLower = m.title;
                 std::transform(movieTitleLower.begin(), movieTitleLower.end(), movieTitleLower.begin(), ::tolower);
 
-                // Check if search query matches or is a substring of the title
+
                 if (movieTitleLower.find(searchLower) != std::string::npos) {
                     found = true;
                     std::cout << "[AVAILABLE] \"" << m.title << "\" [" << m.genre << "]\n";
 
-                    // Show specific showtimes available for this movie
                     bool hasShows = false;
                     for (const auto& show : c1.shows) {
                         if (show.movieId == m.id) {
@@ -175,14 +173,36 @@ void Menu()
                 if (row == 1) price = 25.0;
                 else if (row == 2) price = 15.0;
 
+                incomingPayments.push_back({ bookingMovieTitle, selectedShow.time, row, col, price });
+
                 std::cout << "\n[SUCCESS] Seat booked successfully!\n";
                 std::cout << "Price for this seat: $" << price << "\n";
             }
             break;
         }
         case 4:
-            std::cout << "Processing payment...\n";
+        {
+            std::cout << "\n--- Incoming Payments History ---\n";
+
+            if (incomingPayments.empty()) {
+                std::cout << "No incoming payments recorded yet.\n";
+                break;
+            }
+
+            double totalRevenue = 0.0;
+            for (size_t i = 0; i < incomingPayments.size(); ++i) {
+                const auto& p = incomingPayments[i];
+                std::cout << i + 1 << ". Movie: \"" << p.movieTitle << "\"\n"
+                    << "   Time: " << p.showTime << "\n"
+                    << "   Seat: Row " << p.row << ", Col " << p.col << "\n"
+                    << "   Amount Paid: $" << p.amount << "\n"
+                    << "---------------------------------\n";
+                totalRevenue += p.amount;
+            }
+
+            std::cout << "Total Revenue Collected: $" << totalRevenue << "\n";
             break;
+        }
 
         case 5:
             if (currentUser->isAdmin)
@@ -309,9 +329,9 @@ void Menu()
         default:
             std::cout << "Invalid choice.\n";
             break;
-        } // This closes the main switch statement
+        }
 
         std::cout << "\n====================================\n";
 
-    } while (choice != 6); // This cleanly finishes your menu interaction loop
+    } while (choice != 6);
 }
