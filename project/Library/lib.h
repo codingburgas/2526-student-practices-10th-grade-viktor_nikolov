@@ -15,13 +15,14 @@ struct Show {
     std::string time;
     std::string hallName;
     int movieId;
-    int seating[5][5] = { 0 };
+    int seating[5][5] = { 0 }; // Fixed: Restored to 2D array matrix layout
 };
 
 struct Cinema {
     std::string name;
     std::vector<Show> shows;
 };
+
 struct Payment {
     std::string movieTitle;
     std::string showTime;
@@ -47,4 +48,11 @@ public:
         : User(name, userId, true), accessLevel(access) {
     }
 };
+
+struct SimpleCustomer {
+    std::string name;
+    std::string password;
+    int id;
+};
+
 void Menu();

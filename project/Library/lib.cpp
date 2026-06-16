@@ -3,8 +3,79 @@
 
 void Menu()
 {
-    Admin adminUser("Alice_Manager", 1, 5);
-    User* currentUser = &adminUser;
+    Admin adminUser("Movie_Manager", 1, 5);
+    std::string adminPassword = "!123MovieAdmin123!";
+
+    std::vector<SimpleCustomer> customerDatabase;
+    int nextCustomerId = 2;
+
+    User* currentUser = nullptr;
+    bool isLoggedIn = false;
+
+    std::cout << "=====================================\n";
+    std::cout << "    WELCOME TO THE CINEMA SYSTEM     \n";
+    std::cout << "=====================================\n";
+
+    while (!isLoggedIn) {
+        std::cout << "\n1. Sign Up (Create Customer Account)\n";
+        std::cout << "2. Login\n";
+        std::cout << "3. Exit Program\n";
+        std::cout << "Select Option: ";
+        int authOption;
+        std::cin >> authOption;
+
+        if (authOption == 3) {
+            std::cout << "Exiting system. Goodbye!\n";
+            return;
+        }
+
+        if (authOption == 1) {
+            SimpleCustomer newCust;
+            std::cout << "\n--- Account Registration ---\n";
+            std::cout << "Enter New Username: ";
+            std::cin >> newCust.name;
+            std::cout << "Enter New Password: ";
+            std::cin >> newCust.password;
+            newCust.id = nextCustomerId++;
+
+            customerDatabase.push_back(newCust);
+            std::cout << "[SUCCESS] Account created! You can now log in.\n";
+        }
+        else if (authOption == 2) {
+            std::string inputUser, inputPass;
+            std::cout << "\n--- Account Login ---\n";
+            std::cout << "Enter Username: ";
+            std::cin >> inputUser;
+            std::cout << "Enter Password: ";
+            std::cin >> inputPass;
+
+            if (inputUser == adminUser.username && inputPass == adminPassword) {
+                currentUser = &adminUser;
+                isLoggedIn = true;
+                std::cout << "\n[SUCCESS] Admin access granted. Welcome, manager " << inputUser << "!\n";
+            }
+            else {
+                bool foundCust = false;
+                for (const auto& cust : customerDatabase) {
+                    if (cust.name == inputUser && cust.password == inputPass) {
+                        currentUser = new User(cust.name, cust.id, false);
+                        isLoggedIn = true;
+                        foundCust = true;
+                        std::cout << "\n[SUCCESS] Welcome back, " << inputUser << "!\n";
+                        break;
+                    }
+                }
+                if (!foundCust) {
+                    std::cout << "[ERROR] Invalid username or password! Sign up first if you haven't.\n";
+                }
+            }
+        }
+        else {
+            std::cout << "Invalid option chosen.\n";
+        }
+    }
+
+
 
     std::vector<Movie> movies = {
         { 1, "Inception", "Sci-Fi" },
